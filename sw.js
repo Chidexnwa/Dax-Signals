@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dax-signals-v1';
+const CACHE_NAME = 'dax-signals-v2';
 const ASSETS = ['./index.html', './manifest.json'];
 
 // ── Install & cache ──────────────────────────────────────────────────────────
@@ -66,6 +66,31 @@ self.addEventListener('message', e => {
 
     e.waitUntil(self.registration.showNotification(title, options));
   }
+
+  // ── Invalidated / expired limit-trade alerts ──────────────────────────────
+  if (e.data && e.data.type === 'SIGNAL_INVALID') {
+    const { pair, signal, entry, reason } = e.data.payload;
+
+    const title = `⛔ Signal Invalidated — ${pair}`;
+    const body = `${signal} setup from ${entry} ${reason}`;
+
+    const options = {
+      body,
+      icon: './icon-192.png',
+      badge: './icon-192.png',
+      tag: pair + '-invalid',
+      renotify: true,
+      vibrate: [80, 60, 80],   // short flat buzz — distinct from trade alerts
+      data: { pair, signal, invalid: true },
+      actions: [
+        { action: 'view', title: '📊 View Chart' },
+        { action: 'dismiss', title: 'Dismiss' },
+      ],
+      silent: false,
+    };
+
+    e.waitUntil(self.registration.showNotification(title, options));
+  }
 });
 
 // ── Notification click ────────────────────────────────────────────────────────
@@ -75,3 +100,4 @@ self.addEventListener('notificationclick', e => {
     e.waitUntil(clients.openWindow('./index.html'));
   }
 });
+
