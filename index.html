@@ -11,167 +11,110 @@
 <title>Dax Signal Engine</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg:        #0a0e1a;
-    --surface:   #0f172a;
-    --border:    #1e293b;
-    --purple:    #6366f1;
-    --green:     #22c55e;
-    --red:       #ef4444;
-    --yellow:    #f59e0b;
-    --orange:    #f97316;
-    --cyan:      #22d3ee;
-    --muted:     #475569;
-    --subtle:    #64748b;
-    --text:      #e2e8f0;
-    --text-dim:  #94a3b8;
+    --bg:#0a0e1a; --surface:#0f172a; --border:#1e293b;
+    --purple:#6366f1; --green:#22c55e; --red:#ef4444;
+    --yellow:#f59e0b; --orange:#f97316; --cyan:#22d3ee;
+    --muted:#475569; --subtle:#64748b; --text:#e2e8f0; --text-dim:#94a3b8;
   }
-
-  html, body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-    min-height: 100dvh;
-    -webkit-font-smoothing: antialiased;
-  }
+  html,body { background:var(--bg); color:var(--text); font-family:'Inter','Segoe UI',system-ui,sans-serif; min-height:100dvh; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
 
   /* ── Header ── */
-  .header {
-    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 16px 12px;
-    position: sticky; top: 0; z-index: 100;
-    padding-top: max(16px, env(safe-area-inset-top));
-  }
-  .header-top { display: flex; justify-content: space-between; align-items: center; }
-  .header-eyebrow { font-size: 10px; letter-spacing: 3px; color: var(--purple); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }
-  .header-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
-  .session-badge {
-    font-size: 11px; font-weight: 700; padding: 5px 10px;
-    border-radius: 20px; border: 1px solid;
-    white-space: nowrap;
-  }
-  .header-sub { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
-  .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .header { background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); border-bottom:1px solid var(--border); padding:14px 16px 10px; position:sticky; top:0; z-index:200; padding-top:max(14px,env(safe-area-inset-top)); }
+  .header-top { display:flex; justify-content:space-between; align-items:center; }
+  .header-eyebrow { font-size:9px; letter-spacing:3px; color:var(--purple); font-weight:700; text-transform:uppercase; margin-bottom:1px; }
+  .header-title { font-size:18px; font-weight:800; letter-spacing:-0.5px; }
+  .session-badge { font-size:11px; font-weight:700; padding:5px 10px; border-radius:20px; border:1px solid; white-space:nowrap; }
+  .header-sub { display:flex; gap:10px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+  .status-dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
 
-  /* ── Tabs / pair strip ── */
-  .pair-strip {
-    display: flex; gap: 6px; overflow-x: auto; padding: 12px 16px;
-    scrollbar-width: none; border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-  .pair-strip::-webkit-scrollbar { display: none; }
-  .pair-btn {
-    flex-shrink: 0; padding: 7px 14px; border-radius: 20px;
-    border: 1px solid var(--border); background: transparent;
-    color: var(--text-dim); font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .pair-btn.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+  /* ── View tabs ── */
+  .view-tabs { display:flex; background:var(--surface); border-bottom:1px solid var(--border); }
+  .view-tab { flex:1; padding:11px 0; text-align:center; font-size:13px; font-weight:700; color:var(--text-dim); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; }
+  .view-tab.active { color:var(--purple); border-bottom-color:var(--purple); }
 
-  /* ── Main content ── */
-  .content { padding: 16px; max-width: 600px; margin: 0 auto; }
+  /* ── Pair strip ── */
+  .pair-strip { display:flex; gap:6px; overflow-x:auto; padding:10px 16px; scrollbar-width:none; border-bottom:1px solid var(--border); background:var(--surface); }
+  .pair-strip::-webkit-scrollbar { display:none; }
+  .pair-btn { flex-shrink:0; padding:6px 13px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+  .pair-btn.active { background:var(--purple); border-color:var(--purple); color:#fff; }
 
-  /* ── Signal card ── */
-  .signal-card {
-    border-radius: 16px; border: 1px solid;
-    padding: 20px; margin-bottom: 16px;
-    transition: all 0.3s;
-  }
-  .signal-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-  .price-label { font-size: 12px; color: var(--subtle); margin-bottom: 2px; }
-  .price-value { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -1px; }
-  .meta-row { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
-  .meta-chip { font-size: 11px; color: var(--subtle); }
-  .meta-chip span { font-weight: 700; }
+  /* ── Pages ── */
+  .page { display:none; }
+  .page.active { display:block; }
 
-  .signal-label { font-size: 30px; font-weight: 900; letter-spacing: -1px; line-height: 1; text-align: right; }
-  .signal-strength { font-size: 11px; font-weight: 700; text-align: right; margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
-  .score-line { font-size: 12px; color: var(--subtle); text-align: right; margin-top: 2px; }
+  /* ── Signal page ── */
+  .content { padding:14px; max-width:600px; margin:0 auto; }
+  .signal-card { border-radius:16px; border:1px solid; padding:18px; margin-bottom:14px; transition:all 0.3s; }
+  .signal-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+  .price-label { font-size:12px; color:var(--subtle); margin-bottom:2px; }
+  .price-value { font-size:26px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-1px; }
+  .meta-row { display:flex; gap:10px; margin-top:7px; flex-wrap:wrap; }
+  .meta-chip { font-size:11px; color:var(--subtle); }
+  .meta-chip span { font-weight:700; }
+  .signal-label { font-size:28px; font-weight:900; letter-spacing:-1px; line-height:1; text-align:right; }
+  .signal-strength { font-size:11px; font-weight:700; text-align:right; margin-top:3px; letter-spacing:1px; text-transform:uppercase; }
+  .score-line { font-size:12px; color:var(--subtle); text-align:right; margin-top:2px; }
+  .conf-bar-wrap { margin-top:6px; height:6px; background:var(--border); border-radius:3px; width:110px; margin-left:auto; }
+  .conf-bar { height:100%; border-radius:3px; transition:width 0.4s; }
+  .conf-pct { font-size:10px; color:var(--subtle); text-align:right; margin-top:2px; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:14px; }
+  .card-title { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; }
+  .check-row { display:flex; align-items:flex-start; gap:8px; margin-bottom:8px; }
+  .check-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+  .check-text { font-size:13px; line-height:1.4; }
+  .ind-row { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid rgba(30,41,59,0.5); }
+  .ind-label { font-size:13px; color:var(--subtle); }
+  .ind-val { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .scanner-row { display:flex; align-items:center; justify-content:space-between; border-radius:10px; padding:11px 13px; margin-bottom:7px; border:1px solid; cursor:pointer; transition:all 0.15s; }
+  .scanner-pair { font-size:14px; font-weight:700; width:70px; }
+  .scanner-price { font-size:11px; color:var(--subtle); font-variant-numeric:tabular-nums; }
+  .scanner-right { display:flex; align-items:center; gap:10px; }
+  .scanner-signal { font-size:13px; font-weight:800; min-width:76px; text-align:right; }
+  .scanner-conf { font-size:11px; color:var(--muted); min-width:32px; text-align:right; }
 
-  /* confidence bar */
-  .conf-bar-wrap { margin-top: 6px; height: 6px; background: var(--border); border-radius: 3px; width: 120px; margin-left: auto; }
-  .conf-bar { height: 100%; border-radius: 3px; transition: width 0.4s; }
-  .conf-pct { font-size: 10px; color: var(--subtle); text-align: right; margin-top: 2px; }
+  /* ── Chart page ── */
+  .chart-page { display:none; flex-direction:column; height:calc(100dvh - 160px); }
+  .chart-page.active { display:flex; }
+  .chart-toolbar { display:flex; gap:6px; padding:10px 14px; background:var(--surface); border-bottom:1px solid var(--border); align-items:center; overflow-x:auto; scrollbar-width:none; flex-shrink:0; }
+  .chart-toolbar::-webkit-scrollbar { display:none; }
+  .tf-btn { flex-shrink:0; padding:5px 12px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+  .tf-btn.active { background:var(--purple); border-color:var(--purple); color:#fff; }
+  .chart-wrap { flex:1; position:relative; overflow:hidden; min-height:0; }
+  canvas#chartCanvas { display:block; width:100%; height:100%; }
 
-  /* SL/TP strip */
-  .levels { display: flex; gap: 8px; margin-top: 16px; }
-  .level-box { flex: 1; background: rgba(15,23,42,0.9); border: 1px solid; border-radius: 10px; padding: 10px 12px; }
-  .level-lbl { font-size: 10px; color: var(--subtle); margin-bottom: 3px; }
-  .level-val { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* chart legend overlay */
+  .chart-legend { position:absolute; top:10px; left:12px; display:flex; flex-wrap:wrap; gap:6px; pointer-events:none; }
+  .legend-item { display:flex; align-items:center; gap:4px; background:rgba(10,14,26,0.75); border-radius:6px; padding:3px 8px; }
+  .legend-dot { width:8px; height:3px; border-radius:2px; }
+  .legend-txt { font-size:10px; font-weight:600; color:var(--text-dim); }
 
-  /* ── Checklist card ── */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
-  .card-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
-  .check-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; }
-  .check-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
-  .check-text { font-size: 13px; line-height: 1.4; }
+  /* price ticker sidebar on chart */
+  .price-ticker { position:absolute; right:0; top:0; bottom:0; width:56px; background:rgba(10,14,26,0.5); border-left:1px solid var(--border); pointer-events:none; }
 
-  /* ── Indicators grid ── */
-  .ind-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(30,41,59,0.5); }
-  .ind-label { font-size: 13px; color: var(--subtle); }
-  .ind-val { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
-
-  /* ── Scanner ── */
-  .scanner-row {
-    display: flex; align-items: center; justify-content: space-between;
-    border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
-    border: 1px solid; cursor: pointer; transition: all 0.15s;
-  }
-  .scanner-pair { font-size: 14px; font-weight: 700; width: 70px; }
-  .scanner-price { font-size: 12px; color: var(--subtle); font-variant-numeric: tabular-nums; }
-  .scanner-right { display: flex; align-items: center; gap: 10px; }
-  .scanner-bias { font-size: 11px; font-weight: 700; }
-  .scanner-signal { font-size: 13px; font-weight: 800; min-width: 76px; text-align: right; }
-  .scanner-conf { font-size: 11px; color: var(--muted); min-width: 32px; text-align: right; }
+  /* crosshair info box */
+  .crosshair-box { position:absolute; top:10px; right:64px; background:rgba(15,23,42,0.92); border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:11px; pointer-events:none; display:none; min-width:140px; }
+  .crosshair-box.show { display:block; }
 
   /* ── Bottom controls ── */
-  .bottom-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--surface); border-top: 1px solid var(--border);
-    padding: 12px 16px; display: flex; gap: 10px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
-    z-index: 100;
-  }
-  .btn { flex: 1; padding: 13px; border-radius: 12px; border: 1px solid; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
-  .btn-primary { background: var(--purple); border-color: var(--purple); color: #fff; }
-  .btn-outline { background: transparent; border-color: var(--border); color: var(--text-dim); }
-  .btn-active { background: rgba(34,197,94,0.15); border-color: var(--green); color: var(--green); }
+  .bottom-bar { position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-top:1px solid var(--border); padding:10px 14px; display:flex; gap:8px; padding-bottom:max(10px,env(safe-area-inset-bottom)); z-index:200; }
+  .btn { flex:1; padding:12px; border-radius:12px; border:1px solid; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+  .btn-primary { background:var(--purple); border-color:var(--purple); color:#fff; }
+  .btn-outline { background:transparent; border-color:var(--border); color:var(--text-dim); }
+  .btn-active { background:rgba(34,197,94,0.15); border-color:var(--green); color:var(--green); }
 
-  /* ── Notif permission banner ── */
-  .notif-banner {
-    background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3);
-    border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .notif-banner-text { font-size: 13px; color: var(--text); flex: 1; line-height: 1.4; }
-  .notif-banner-btn { background: var(--purple); color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed; top: max(80px, env(safe-area-inset-top) + 70px); left: 50%; transform: translateX(-50%);
-    background: #1e293b; border: 1px solid var(--border);
-    border-radius: 12px; padding: 12px 20px; font-size: 13px; font-weight: 600;
-    z-index: 999; white-space: nowrap; opacity: 0; transition: opacity 0.3s;
-    pointer-events: none; max-width: 90vw; text-align: center;
-  }
-  .toast.show { opacity: 1; }
-
-  /* spacer for fixed bottom bar */
-  .bottom-spacer { height: 80px; }
-
-  /* ── Pulse animation for live dot ── */
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-  .pulse { animation: pulse 1.5s infinite; }
-
-  /* ── Countdown ring ── */
-  .refresh-ring { font-size: 11px; color: var(--subtle); display: flex; align-items: center; gap: 4px; }
+  .notif-banner { background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.3); border-radius:12px; padding:13px 15px; margin-bottom:14px; display:flex; align-items:center; gap:12px; }
+  .notif-banner-text { font-size:13px; color:var(--text); flex:1; line-height:1.4; }
+  .notif-banner-btn { background:var(--purple); color:#fff; border:none; border-radius:8px; padding:7px 13px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .toast { position:fixed; top:max(80px,env(safe-area-inset-top) + 70px); left:50%; transform:translateX(-50%); background:#1e293b; border:1px solid var(--border); border-radius:12px; padding:11px 18px; font-size:13px; font-weight:600; z-index:999; white-space:nowrap; opacity:0; transition:opacity 0.3s; pointer-events:none; max-width:90vw; text-align:center; }
+  .toast.show { opacity:1; }
+  .bottom-spacer { height:76px; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+  .pulse { animation:pulse 1.5s infinite; }
+  .refresh-ring { font-size:11px; color:var(--subtle); display:flex; align-items:center; gap:4px; }
 </style>
 </head>
 <body>
-
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <!-- Header -->
@@ -190,525 +133,255 @@
   </div>
 </div>
 
+<!-- View tabs -->
+<div class="view-tabs">
+  <div class="view-tab active" id="tabSignals" onclick="switchView('signals')">📊 Signals</div>
+  <div class="view-tab" id="tabChart" onclick="switchView('chart')">📈 Live Chart</div>
+</div>
+
 <!-- Pair strip -->
 <div class="pair-strip" id="pairStrip"></div>
 
-<!-- Main content -->
-<div class="content" id="mainContent">
-  <div style="text-align:center;padding:40px 0;color:var(--subtle);font-size:14px">
-    Tap <strong style="color:var(--text)">Start Signals</strong> below to begin analysis
+<!-- ═══ SIGNALS PAGE ═══ -->
+<div class="page active" id="pageSignals">
+  <div class="content" id="mainContent">
+    <div style="text-align:center;padding:40px 0;color:var(--subtle);font-size:14px">
+      Tap <strong style="color:var(--text)">Start Signals</strong> below to begin
+    </div>
   </div>
+  <div class="bottom-spacer"></div>
 </div>
-<div class="bottom-spacer"></div>
+
+<!-- ═══ CHART PAGE ═══ -->
+<div class="page" id="pageChart">
+  <div class="chart-page" id="chartPageInner">
+    <!-- timeframe toolbar -->
+    <div class="chart-toolbar">
+      <span style="font-size:11px;color:var(--subtle);font-weight:600;margin-right:4px">TF:</span>
+      <button class="tf-btn" onclick="setTF(1)">M1</button>
+      <button class="tf-btn" onclick="setTF(5)">M5</button>
+      <button class="tf-btn active" onclick="setTF(15)">M15</button>
+      <button class="tf-btn" onclick="setTF(60)">H1</button>
+      <button class="tf-btn" onclick="setTF(240)">H4</button>
+      <button class="tf-btn" onclick="setTF(1440)">D1</button>
+      <div style="margin-left:auto;display:flex;gap:6px">
+        <button class="tf-btn" onclick="chart_zoomIn()">＋</button>
+        <button class="tf-btn" onclick="chart_zoomOut()">－</button>
+      </div>
+    </div>
+    <!-- canvas -->
+    <div class="chart-wrap" id="chartWrap">
+      <canvas id="chartCanvas"></canvas>
+      <!-- legend -->
+      <div class="chart-legend" id="chartLegend"></div>
+      <!-- price axis -->
+      <div class="price-ticker" id="priceTicker"></div>
+      <!-- crosshair box -->
+      <div class="crosshair-box" id="crosshairBox"></div>
+    </div>
+  </div>
+  <div class="bottom-spacer"></div>
+</div>
 
 <!-- Bottom bar -->
 <div class="bottom-bar">
-  <button class="btn btn-outline" id="scanBtn" onclick="runScan()">🔍 Scan All</button>
-  <button class="btn btn-primary" id="liveBtn" onclick="toggleLive()">▶ Start Signals</button>
+  <button class="btn btn-outline" id="scanBtn" onclick="runScan()">🔍 Scan</button>
+  <button class="btn btn-primary" id="liveBtn" onclick="toggleLive()">▶ Start</button>
   <button class="btn btn-outline" id="notifBtn" onclick="requestNotifPermission()">🔔 Notify</button>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
 //  CONFIG
-// ═══════════════════════════════════════════════════════════
-const REFRESH_INTERVAL = 30; // seconds
-const PAIRS = [
-  "XAU/USD","ETH/USD",
-  "EUR/USD","GBP/USD","USD/JPY",
-  "AUD/USD","USD/CAD","GBP/JPY","EUR/GBP","NZD/USD"
-];
+// ════════════════════════════════════════════════════════════
+const REFRESH_INTERVAL = 30;
+const PAIRS = ["XAU/USD","ETH/USD","EUR/USD","GBP/USD","USD/JPY","AUD/USD","USD/CAD","GBP/JPY","EUR/GBP","NZD/USD"];
 
-// ═══════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════════════════════
-let selectedPair = "XAU/USD";
-let liveActive   = false;
-let liveTimer    = null;
-let countdownVal = REFRESH_INTERVAL;
-let countdownTimer = null;
-let allResults   = {};
-let swReg        = null;
+// ════════════════════════════════════════════════════════════
+let selectedPair  = "XAU/USD";
+let liveActive    = false;
+let liveTimer     = null;
+let countdownVal  = REFRESH_INTERVAL;
+let countdownTimer= null;
+let allResults    = {};
+let pendingTrades = {};   // pair -> { signal, entry, sl, tp1, tp2, tp3, openedAt, barsAlive }
+const TRADE_EXPIRY_CYCLES = 20; // ~10 min at 30s refresh, treat as stale/expired
+let currentView   = 'signals';
+let currentTF     = 15;          // minutes per bar
+let chartBars     = [];
+let visibleBars   = 80;          // how many bars to show
+let chartResult   = null;
+let animFrame     = null;
+let isDragging    = false;
+let dragStartX    = 0;
+let dragStartOffset = 0;
+let barOffset     = 0;           // scroll offset (bars from right)
+let crosshairX    = -1;
+let crosshairY    = -1;
 
-// ═══════════════════════════════════════════════════════════
-//  SERVICE WORKER REGISTRATION
-// ═══════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+//  SERVICE WORKER
+// ════════════════════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(reg => {
-    swReg = reg;
-    console.log('[SW] registered');
-  }).catch(e => console.warn('[SW] failed', e));
+  navigator.serviceWorker.register('./sw.js')
+    .then(r => console.log('[SW] ok'))
+    .catch(e => console.warn('[SW]', e));
 }
 
-// ═══════════════════════════════════════════════════════════
-//  NOTIFICATION PERMISSION
-// ═══════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ════════════════════════════════════════════════════════════
 function requestNotifPermission() {
-  if (!('Notification' in window)) {
-    showToast('Notifications not supported on this browser');
-    return;
-  }
-  Notification.requestPermission().then(perm => {
-    if (perm === 'granted') {
+  if (!('Notification' in window)) { showToast('Notifications not supported'); return; }
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') {
       showToast('✅ Notifications enabled!');
-      document.getElementById('notifBtn').textContent = '🔔 ON';
-      document.getElementById('notifBtn').classList.add('btn-active');
-      document.getElementById('notifBtn').classList.remove('btn-outline');
-    } else {
-      showToast('❌ Permission denied — enable in phone settings');
-    }
+      const btn = document.getElementById('notifBtn');
+      btn.textContent = '🔔 ON'; btn.className = 'btn btn-active';
+    } else { showToast('❌ Permission denied — check phone settings'); }
   });
 }
 
-function sendNotification(result) {
-  if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
-    // Fallback: direct Notification API
-    if (Notification.permission === 'granted') {
-      const emoji = signalEmoji(result.signal);
-      const strength = isStrong(result.signal) ? '⚡ STRONG' : '〰 WEAK';
-      const n = new Notification(
-        `${emoji} ${strength} ${result.signal} — ${result.pair}`,
-        {
-          body: `Price: ${fmt(result.price, result.pair)}  |  Confidence: ${result.confidence.toFixed(0)}%` +
-                (result.sl ? `  |  SL: ${fmt(result.sl, result.pair)}` : ''),
-          tag: result.pair,
-          renotify: true,
-          icon: './manifest.json',
-        }
-      );
-      setTimeout(() => n.close(), 8000);
-    }
-    return;
+function sendNotification(r) {
+  if (Notification.permission !== 'granted') return;
+  const emoji = signalEmoji(r.signal);
+  const strong = isStrong(r.signal) ? '⚡ STRONG' : '〰 WEAK';
+  const title  = `${emoji} ${strong} ${r.signal} — ${r.pair}`;
+  const body   = `Price: ${fmt(r.price,r.pair)}  |  Conf: ${r.confidence.toFixed(0)}%`
+               + (r.sl ? `  |  SL: ${fmt(r.sl,r.pair)}` : '');
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type:'SIGNAL_NOTIFY', payload:{ pair:r.pair, signal:r.signal, confidence:r.confidence.toFixed(0), price:fmt(r.price,r.pair), sl:r.sl?fmt(r.sl,r.pair):null, tp1:r.tp1?fmt(r.tp1,r.pair):null }});
+  } else {
+    const n = new Notification(title, { body, tag:r.pair, renotify:true });
+    setTimeout(() => n.close(), 8000);
   }
-  navigator.serviceWorker.controller.postMessage({
-    type: 'SIGNAL_NOTIFY',
-    payload: {
-      pair:       result.pair,
-      signal:     result.signal,
-      confidence: result.confidence.toFixed(0),
-      price:      fmt(result.price, result.pair),
-      sl:         result.sl ? fmt(result.sl, result.pair) : null,
-      tp1:        result.tp1 ? fmt(result.tp1, result.pair) : null,
-    }
-  });
 }
 
-// ═══════════════════════════════════════════════════════════
-//  SIGNAL ENGINE  (Order Flow + TA Confluence)
-// ═══════════════════════════════════════════════════════════
+function sendInvalidationNotification(pair, reason, trade) {
+  if (Notification.permission !== 'granted') return;
+  const title = `⛔ Signal Invalidated — ${pair}`;
+  const body  = `${trade.signal} setup from ${fmt(trade.entry,pair)} ${reason}`;
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'SIGNAL_INVALID',
+      payload: { pair, signal: trade.signal, entry: fmt(trade.entry,pair), reason }
+    });
+  } else {
+    const n = new Notification(title, { body, tag: pair+'-invalid', renotify:true });
+    setTimeout(() => n.close(), 8000);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  PRICE SIMULATION
+// ════════════════════════════════════════════════════════════
 const BASE_PRICES = {
-  "XAU/USD": 2340.00, "ETH/USD": 3420.00,
-  "EUR/USD": 1.0820,  "GBP/USD": 1.2750,  "USD/JPY": 154.20,
-  "AUD/USD": 0.6580,  "USD/CAD": 1.3650,  "GBP/JPY": 196.50,
-  "EUR/GBP": 0.8490,  "NZD/USD": 0.5990,
+  "XAU/USD":2340,"ETH/USD":3420,"EUR/USD":1.082,"GBP/USD":1.275,
+  "USD/JPY":154.2,"AUD/USD":0.658,"USD/CAD":1.365,"GBP/JPY":196.5,
+  "EUR/GBP":0.849,"NZD/USD":0.599
 };
 
-function getSimPrice(pair) {
-  const base = BASE_PRICES[pair] || 1.0;
-  const t = Date.now() / 60000;
-  return base + Math.sin(t * 1.3 + pair.length * 0.7) * base * 0.003;
-}
-
 function decimals(pair) {
-  if (pair === "XAU/USD" || pair === "ETH/USD") return 2;
+  if (pair==="XAU/USD"||pair==="ETH/USD") return 2;
   if (pair.includes("JPY")) return 3;
   return 5;
 }
+function fmt(val,pair) { return val.toFixed(decimals(pair)); }
 
-function fmt(val, pair) { return val.toFixed(decimals(pair)); }
+function getSimPrice(pair) {
+  const base = BASE_PRICES[pair]||1;
+  const t = Date.now()/60000;
+  return base + Math.sin(t*1.3 + pair.length*0.7)*base*0.003;
+}
 
-function generateBars(basePrice, count = 200) {
-  const bars = []; let price = basePrice;
-  const seed = basePrice * 10000;
-  for (let i = 0; i < count; i++) {
-    const noise = () => Math.sin(seed * (i + 1) * 7.3 + i) * 0.0008;
-    const trend = Math.sin(i / 30) * 0.0003;
-    const open = price;
-    const close = price + noise() + trend;
-    const high = Math.max(open, close) + Math.abs(noise()) * 0.5;
-    const low  = Math.min(open, close) - Math.abs(noise()) * 0.5;
-    const vol  = 1000 + Math.abs(Math.sin(seed + i)) * 5000;
-    bars.push({ open, high, low, close, vol });
+// Generate OHLCV bars — realistic-looking with trend waves
+function generateBars(pair, tfMin, count=200) {
+  const base = BASE_PRICES[pair]||1;
+  const seed = base * pair.length;
+  const bars = [];
+  // realistic volatility per pair
+  const vol = pair==="XAU/USD"?0.0015 : pair==="ETH/USD"?0.003 : pair.includes("JPY")?0.0012 : 0.0008;
+  let price = base;
+  const now = Date.now();
+  for (let i=0; i<count; i++) {
+    const t = i/count;
+    const trend  = Math.sin(seed/1000 + t*6.28*2)*vol*0.4;
+    const wave   = Math.sin(seed/500  + t*6.28*5)*vol*0.2;
+    const noise  = (Math.sin(seed*(i+1)*17.3)*0.5 + Math.sin(seed*(i+1)*31.7)*0.3 + Math.sin(seed*(i+1)*53.1)*0.2)*vol;
+    const change = trend + wave + noise;
+    const open   = price;
+    const close  = price + change * base;
+    const range  = Math.abs(change)*base*0.6 + vol*base*0.3;
+    const high   = Math.max(open,close) + range*(0.3+Math.abs(Math.sin(seed+i))*0.4);
+    const low    = Math.min(open,close) - range*(0.3+Math.abs(Math.sin(seed+i+1))*0.4);
+    const volume = 500 + Math.abs(Math.sin(seed+i*2.7))*8000;
+    const ts     = now - (count-i)*tfMin*60*1000;
+    bars.push({ open, high, low, close, volume, ts, i });
     price = close;
   }
+  // Patch last bar to match current sim price
+  const cur = getSimPrice(pair);
+  const last = bars[bars.length-1];
+  last.close = cur;
+  last.high  = Math.max(last.high, cur);
+  last.low   = Math.min(last.low, cur);
   return bars;
 }
 
+// ════════════════════════════════════════════════════════════
+//  INDICATORS
+// ════════════════════════════════════════════════════════════
 function calcEMA(bars, period) {
-  const k = 2 / (period + 1); let e = bars[0].close;
-  return bars.map(b => { e = b.close * k + e * (1 - k); return e; });
+  const k=2/(period+1); let e=bars[0].close;
+  return bars.map(b=>{ e=b.close*k+e*(1-k); return e; });
 }
-
-function calcRSI(bars, period = 14) {
-  let gains = 0, losses = 0;
-  for (let i = 1; i <= period; i++) {
-    const d = bars[i].close - bars[i-1].close;
-    if (d > 0) gains += d; else losses -= d;
-  }
-  const out = new Array(period).fill(50);
-  let ag = gains / period, al = losses / period;
-  for (let i = period; i < bars.length; i++) {
-    const d = bars[i].close - bars[i-1].close;
-    ag = (ag * (period-1) + Math.max(d,0)) / period;
-    al = (al * (period-1) + Math.max(-d,0)) / period;
-    out.push(al === 0 ? 100 : 100 - 100 / (1 + ag / al));
+function calcRSI(bars, period=14) {
+  let gains=0,losses=0;
+  for(let i=1;i<=period;i++){const d=bars[i].close-bars[i-1].close;if(d>0)gains+=d;else losses-=d;}
+  const out=new Array(period).fill(50);
+  let ag=gains/period,al=losses/period;
+  for(let i=period;i<bars.length;i++){
+    const d=bars[i].close-bars[i-1].close;
+    ag=(ag*(period-1)+Math.max(d,0))/period;
+    al=(al*(period-1)+Math.max(-d,0))/period;
+    out.push(al===0?100:100-100/(1+ag/al));
   }
   return out;
 }
-
 function findZones(bars) {
-  const zones = [];
-  for (let i = 5; i < bars.length - 5; i++) {
-    const prevH = bars.slice(i-5,i).map(b=>b.high);
-    const nextH = bars.slice(i+1,i+6).map(b=>b.high);
-    const prevL = bars.slice(i-5,i).map(b=>b.low);
-    const nextL = bars.slice(i+1,i+6).map(b=>b.low);
-    if (bars[i].high > Math.max(...prevH) && bars[i].high > Math.max(...nextH))
-      zones.push({ type:'supply', price: bars[i].high });
-    if (bars[i].low < Math.min(...prevL) && bars[i].low < Math.min(...nextL))
-      zones.push({ type:'demand', price: bars[i].low });
+  const zones=[];
+  for(let i=5;i<bars.length-5;i++){
+    const pH=bars.slice(i-5,i).map(b=>b.high),nH=bars.slice(i+1,i+6).map(b=>b.high);
+    const pL=bars.slice(i-5,i).map(b=>b.low), nL=bars.slice(i+1,i+6).map(b=>b.low);
+    if(bars[i].high>Math.max(...pH)&&bars[i].high>Math.max(...nH)) zones.push({type:'supply',price:bars[i].high});
+    if(bars[i].low<Math.min(...pL)&&bars[i].low<Math.min(...nL))   zones.push({type:'demand',price:bars[i].low});
   }
   return zones.slice(-12);
 }
-
-function detectStructure(bars) {
-  const last = bars.slice(-20);
-  const highs = last.map(b=>b.high), lows = last.map(b=>b.low);
-  const n = highs.length;
-  const hh = highs[n-1] > Math.max(...highs.slice(0,-1));
-  const ll = lows[n-1]  < Math.min(...lows.slice(0,-1));
-  const lh = highs[n-1] < highs[n-5];
-  const hl = lows[n-1]  > lows[n-5];
-  if (hh && hl)  return { label:'BOS ↑ Bullish',    bias:'bullish' };
-  if (ll && lh)  return { label:'BOS ↓ Bearish',    bias:'bearish' };
-  if (lh && ll)  return { label:'CHoCH ↓ Reversal', bias:'bearish' };
-  if (hh && ll)  return { label:'CHoCH ↑ Reversal', bias:'bullish' };
-  return           { label:'Ranging',               bias:'neutral' };
+function detectStructure(bars){
+  const last=bars.slice(-20),h=last.map(b=>b.high),l=last.map(b=>b.low),n=h.length;
+  const hh=h[n-1]>Math.max(...h.slice(0,-1)),ll=l[n-1]<Math.min(...l.slice(0,-1));
+  const lh=h[n-1]<h[n-5],hl=l[n-1]>l[n-5];
+  if(hh&&hl) return{label:'BOS ↑ Bullish',bias:'bullish'};
+  if(ll&&lh) return{label:'BOS ↓ Bearish',bias:'bearish'};
+  if(lh&&ll) return{label:'CHoCH ↓ Reversal',bias:'bearish'};
+  if(hh&&ll) return{label:'CHoCH ↑ Reversal',bias:'bullish'};
+  return{label:'Ranging',bias:'neutral'};
+}
+function currentSession(){
+  const h=new Date().getUTCHours();
+  if(h>=7&&h<16)  return{name:'London Kill Zone',  color:'#f59e0b',active:true};
+  if(h>=12&&h<21) return{name:'New York Kill Zone',color:'#6366f1',active:true};
+  if(h>=23||h<8)  return{name:'Asian Session',     color:'#22d3ee',active:true};
+  return{name:'Off-Session',color:'#475569',active:false};
 }
 
-function currentSession() {
-  const h = new Date().getUTCHours();
-  if (h >= 7  && h < 16) return { name:'London Kill Zone',   color:'#f59e0b', active:true };
-  if (h >= 12 && h < 21) return { name:'New York Kill Zone', color:'#6366f1', active:true };
-  if (h >= 23 || h < 8)  return { name:'Asian Session',      color:'#22d3ee', active:true };
-  return { name:'Off-Session', color:'#475569', active:false };
-}
-
+// ════════════════════════════════════════════════════════════
+//  MAIN ANALYSIS ENGINE
+// ════════════════════════════════════════════════════════════
 function analyze(pair) {
-  const price  = getSimPrice(pair);
-  const bars   = generateBars(price);
-  const sess   = currentSession();
-  const e20    = calcEMA(bars, 20);
-  const e50    = calcEMA(bars, 50);
-  const e200   = calcEMA(bars, 200);
-  const rsiArr = calcRSI(bars);
-  const rsiNow = rsiArr[rsiArr.length-1];
-  const zones  = findZones(bars);
-  const struct = detectStructure(bars);
-  const e20n = e20[e20.length-1], e50n = e50[e50.length-1], e200n = e200[e200.length-1];
-
-  const slope = e200n - e200[e200.length-10];
-  const bias  = slope > 0.0001 ? 'bullish' : slope < -0.0001 ? 'bearish' : 'neutral';
-
-  let score = 0;
-  const reasons = [];
-
-  // 1. Session
-  if (sess.active) {
-    score += 1;
-    reasons.push({ text:`✓ ${sess.name}`, type:'positive' });
-  } else {
-    reasons.push({ text:'✗ Off-session — lower probability', type:'negative' });
-  }
-
-  // 2. HTF bias
-  if (bias === 'bullish')      { score += 2; reasons.push({ text:'✓ HTF Bias: Bullish (above 200 EMA)', type:'positive' }); }
-  else if (bias === 'bearish') { score -= 2; reasons.push({ text:'✓ HTF Bias: Bearish (below 200 EMA)', type:'positive' }); }
-  else                          { reasons.push({ text:'✗ HTF Bias: Neutral', type:'negative' }); }
-
-  // 3. EMA ribbon
-  if (e20n > e50n && e50n > e200n)      { score += 2; reasons.push({ text:'✓ EMA Ribbon: Bullish stack (20>50>200)', type:'positive' }); }
-  else if (e20n < e50n && e50n < e200n) { score -= 2; reasons.push({ text:'✓ EMA Ribbon: Bearish stack (20<50<200)', type:'positive' }); }
-  else                                   { reasons.push({ text:'✗ EMA Ribbon: Mixed alignment', type:'negative' }); }
-
-  // 4. Market structure
-  if (struct.bias === 'bullish')      { score += 2; reasons.push({ text:`✓ Structure: ${struct.label}`, type:'positive' }); }
-  else if (struct.bias === 'bearish') { score -= 2; reasons.push({ text:`✓ Structure: ${struct.label}`, type:'positive' }); }
-  else                                 { reasons.push({ text:`✗ Structure: ${struct.label}`, type:'negative' }); }
-
-  // 5. RSI
-  if (rsiNow < 45 && bias === 'bullish')      { score += 1; reasons.push({ text:`✓ RSI ${rsiNow.toFixed(1)}: Oversold pullback in uptrend`, type:'positive' }); }
-  else if (rsiNow > 55 && bias === 'bearish') { score += 1; reasons.push({ text:`✓ RSI ${rsiNow.toFixed(1)}: Overbought in downtrend`, type:'positive' }); }
-  else if (rsiNow > 70)                        { score -= 1; reasons.push({ text:`⚠ RSI ${rsiNow.toFixed(1)}: Overbought — caution longs`, type:'warning' }); }
-  else if (rsiNow < 30)                        { score += 1; reasons.push({ text:`✓ RSI ${rsiNow.toFixed(1)}: Oversold — watch reversal`, type:'positive' }); }
-  else                                          { reasons.push({ text:`— RSI ${rsiNow.toFixed(1)}: Neutral momentum`, type:'neutral' }); }
-
-  // 6. Supply/Demand zone
-  const nearby    = zones.filter(z => Math.abs(z.price - price) / price < 0.002);
-  const demandZ   = zones.filter(z => z.type === 'demand' && z.price < price).sort((a,b) => b.price-a.price)[0];
-  const supplyZ   = zones.filter(z => z.type === 'supply' && z.price > price).sort((a,b) => a.price-b.price)[0];
-  if (nearby.length > 0) {
-    const z = nearby[0];
-    if (z.type === 'demand') { score += 2; reasons.push({ text:`✓ At Demand Zone (${fmt(z.price,pair)})`, type:'positive' }); }
-    else                      { score -= 2; reasons.push({ text:`✓ At Supply Zone (${fmt(z.price,pair)})`, type:'positive' }); }
-  } else {
-    reasons.push({ text:'— Between zones — wait for touch', type:'neutral' });
-  }
-
-  // Signal
-  let signal, signalColor;
-  if      (score >= 5)  { signal = 'BUY';       signalColor = '#22c55e'; }
-  else if (score <= -5) { signal = 'SELL';      signalColor = '#ef4444'; }
-  else if (score >= 3)  { signal = 'WEAK BUY';  signalColor = '#86efac'; }
-  else if (score <= -3) { signal = 'WEAK SELL'; signalColor = '#fca5a5'; }
-  else                   { signal = 'WAIT';      signalColor = '#94a3b8'; }
-
-  const confidence = signal === 'WAIT' ? 30 : Math.min(99, 50 + Math.abs(score) * 6);
-  const atr = bars.slice(-14).reduce((s,b) => s + (b.high-b.low), 0) / 14;
-  const sl  = signal.includes('BUY')  ? price - atr*1.5 : signal.includes('SELL') ? price + atr*1.5 : null;
-  const tp1 = signal.includes('BUY')  ? price + atr*2   : signal.includes('SELL') ? price - atr*2   : null;
-  const tp2 = signal.includes('BUY')  ? price + atr*4   : signal.includes('SELL') ? price - atr*4   : null;
-
-  return { pair, price, signal, signalColor, score, confidence,
-           rsi: rsiNow, bias, struct, ema: { e20:e20n, e50:e50n, e200:e200n },
-           zones: { demand:demandZ, supply:supplyZ },
-           sl, tp1, tp2, atr, reasons, session:sess };
-}
-
-// ═══════════════════════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════════════════════
-function isStrong(sig) { return sig === 'BUY' || sig === 'SELL'; }
-function signalEmoji(sig) {
-  return sig === 'BUY' ? '🟢' : sig === 'SELL' ? '🔴' : sig === 'WEAK BUY' ? '🟡' : sig === 'WEAK SELL' ? '🟠' : '⚪';
-}
-function signalBg(sig) {
-  if (sig.includes('BUY'))  return 'rgba(34,197,94,0.07)';
-  if (sig.includes('SELL')) return 'rgba(239,68,68,0.07)';
-  return 'rgba(148,163,184,0.04)';
-}
-function reasonColor(type) {
-  return { positive:'#22c55e', negative:'#ef4444', warning:'#f59e0b', neutral:'#64748b' }[type] || '#64748b';
-}
-
-// ═══════════════════════════════════════════════════════════
-//  TOAST
-// ═══════════════════════════════════════════════════════════
-let toastTimeout;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => el.classList.remove('show'), 3000);
-}
-
-// ═══════════════════════════════════════════════════════════
-//  RENDER
-// ═══════════════════════════════════════════════════════════
-function renderPairStrip() {
-  const strip = document.getElementById('pairStrip');
-  strip.innerHTML = PAIRS.map(p =>
-    `<button class="pair-btn ${p===selectedPair?'active':''}" onclick="selectPair('${p}')">${p}</button>`
-  ).join('');
-}
-
-function renderMain(result) {
-  const dp = decimals(result.pair);
-  const content = document.getElementById('mainContent');
-  const strengthLabel = isStrong(result.signal)
-    ? `<span style="color:#22c55e">⚡ STRONG</span>`
-    : result.signal === 'WAIT'
-      ? `<span style="color:#94a3b8">— WAIT</span>`
-      : `<span style="color:#f59e0b">〰 WEAK</span>`;
-
-  content.innerHTML = `
-    <!-- notification banner if not granted -->
-    ${Notification.permission !== 'granted' ? `
-    <div class="notif-banner">
-      <span style="font-size:22px">🔔</span>
-      <div class="notif-banner-text">Enable notifications to get signal alerts every ${REFRESH_INTERVAL}s</div>
-      <button class="notif-banner-btn" onclick="requestNotifPermission()">Enable</button>
-    </div>` : ''}
-
-    <!-- Signal card -->
-    <div class="signal-card" style="background:${signalBg(result.signal)};border-color:${result.signalColor}30">
-      <div class="signal-row">
-        <div>
-          <div class="price-label">${result.pair} · Live Price</div>
-          <div class="price-value">${fmt(result.price, result.pair)}</div>
-          <div class="meta-row">
-            <span class="meta-chip">HTF: <span style="color:${result.bias==='bullish'?'#22c55e':result.bias==='bearish'?'#ef4444':'#94a3b8'}">${result.bias.toUpperCase()}</span></span>
-            <span class="meta-chip">RSI: <span style="color:${result.rsi>70?'#ef4444':result.rsi<30?'#22c55e':'#94a3b8'}">${result.rsi.toFixed(1)}</span></span>
-            <span class="meta-chip" style="color:#a5b4fc">${result.struct.label}</span>
-          </div>
-        </div>
-        <div>
-          <div class="signal-label" style="color:${result.signalColor}">${signalEmoji(result.signal)} ${result.signal}</div>
-          <div class="signal-strength">${strengthLabel}</div>
-          <div class="score-line">Score: ${result.score>0?'+':''}${result.score}</div>
-          <div class="conf-bar-wrap">
-            <div class="conf-bar" style="width:${result.confidence}%;background:${result.signalColor}"></div>
-          </div>
-          <div class="conf-pct">${result.confidence.toFixed(0)}% confidence</div>
-        </div>
-      </div>
-
-      ${result.sl ? `
-      <div class="levels">
-        <div class="level-box" style="border-color:#ef444430">
-          <div class="level-lbl">Stop Loss</div>
-          <div class="level-val" style="color:#ef4444">${fmt(result.sl, result.pair)}</div>
-        </div>
-        <div class="level-box" style="border-color:#22c55e30">
-          <div class="level-lbl">TP1 · 1:2R</div>
-          <div class="level-val" style="color:#22c55e">${fmt(result.tp1, result.pair)}</div>
-        </div>
-        <div class="level-box" style="border-color:#4ade8030">
-          <div class="level-lbl">TP2 · 1:4R</div>
-          <div class="level-val" style="color:#4ade80">${fmt(result.tp2, result.pair)}</div>
-        </div>
-      </div>` : ''}
-    </div>
-
-    <!-- Confluence checklist -->
-    <div class="card">
-      <div class="card-title">Confluence Checklist</div>
-      ${result.reasons.map(r => `
-        <div class="check-row">
-          <div class="check-dot" style="background:${reasonColor(r.type)}"></div>
-          <div class="check-text" style="color:${r.type==='negative'?'#ef4444':r.type==='warning'?'#f59e0b':r.type==='neutral'?'#64748b':'#e2e8f0'}">${r.text}</div>
-        </div>`).join('')}
-    </div>
-
-    <!-- Key indicators -->
-    <div class="card">
-      <div class="card-title">Key Indicators</div>
-      ${[
-        ['EMA 20',  fmt(result.ema.e20,result.pair),  '#f59e0b'],
-        ['EMA 50',  fmt(result.ema.e50,result.pair),  '#6366f1'],
-        ['EMA 200', fmt(result.ema.e200,result.pair), '#22d3ee'],
-        ['RSI (14)',result.rsi.toFixed(1), result.rsi>70?'#ef4444':result.rsi<30?'#22c55e':'#94a3b8'],
-        ['ATR',     fmt(result.atr,result.pair),       '#a78bfa'],
-        ['Demand',  result.zones.demand ? fmt(result.zones.demand.price,result.pair) : '—', '#22c55e'],
-        ['Supply',  result.zones.supply ? fmt(result.zones.supply.price,result.pair) : '—', '#ef4444'],
-      ].map(([lbl,val,col]) => `
-        <div class="ind-row">
-          <span class="ind-label">${lbl}</span>
-          <span class="ind-val" style="color:${col}">${val}</span>
-        </div>`).join('')}
-    </div>
-
-    <!-- Scanner -->
-    <div class="card">
-      <div class="card-title">All Pairs Scanner</div>
-      ${PAIRS.map(p => {
-        const s = allResults[p];
-        if (!s) return `<div class="scanner-row" style="border-color:var(--border);background:transparent" onclick="selectPair('${p}')"><span class="scanner-pair">${p}</span><span style="font-size:12px;color:var(--subtle)">—</span></div>`;
-        return `
-        <div class="scanner-row" style="background:${signalBg(s.signal)};border-color:${s.signalColor}20" onclick="selectPair('${p}')">
-          <div>
-            <span class="scanner-pair" style="color:${s.pair===selectedPair?'#a5b4fc':'var(--text)'}">${s.pair}</span>
-            <div class="scanner-price">${fmt(s.price,s.pair)}</div>
-          </div>
-          <div class="scanner-right">
-            <span class="scanner-bias" style="color:${s.bias==='bullish'?'#22c55e':s.bias==='bearish'?'#ef4444':'#64748b'}">${s.bias.toUpperCase()}</span>
-            <span style="font-size:11px;color:${s.rsi>70?'#ef4444':s.rsi<30?'#22c55e':'#64748b'}">RSI ${s.rsi.toFixed(0)}</span>
-            <span class="scanner-signal" style="color:${s.signalColor}">${signalEmoji(s.signal)} ${s.signal}</span>
-            <span class="scanner-conf">${s.confidence.toFixed(0)}%</span>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>
-
-    <div class="bottom-spacer"></div>
-  `;
-}
-
-function updateHeader() {
-  const sess = currentSession();
-  const badge = document.getElementById('sessionBadge');
-  badge.textContent = `● ${sess.name}`;
-  badge.style.color = sess.color;
-  badge.style.borderColor = sess.color + '60';
-  badge.style.background = sess.color + '18';
-}
-
-// ═══════════════════════════════════════════════════════════
-//  SCAN LOGIC
-// ═══════════════════════════════════════════════════════════
-function runScan() {
-  PAIRS.forEach(p => { allResults[p] = analyze(p); });
-  const sel = allResults[selectedPair];
-  if (sel) renderMain(sel);
-  updateHeader();
-  document.getElementById('updateLabel').textContent = `Updated ${new Date().toLocaleTimeString()}`;
-  document.getElementById('liveDot').style.background = '#22c55e';
-}
-
-function runScanAndNotify() {
-  runScan();
-  // Notify for every pair on each refresh cycle
-  PAIRS.forEach(p => {
-    const r = allResults[p];
-    if (r && Notification.permission === 'granted') {
-      sendNotification(r);
-    }
-  });
-}
-
-function selectPair(pair) {
-  selectedPair = pair;
-  renderPairStrip();
-  if (allResults[pair]) renderMain(allResults[pair]);
-  else { runScan(); }
-}
-
-// ═══════════════════════════════════════════════════════════
-//  LIVE TOGGLE + COUNTDOWN
-// ═══════════════════════════════════════════════════════════
-function toggleLive() {
-  liveActive = !liveActive;
-  const btn = document.getElementById('liveBtn');
-  const dot = document.getElementById('liveDot');
-
-  if (liveActive) {
-    btn.textContent = '⏸ Stop';
-    btn.className = 'btn btn-active';
-    dot.style.background = '#22c55e';
-    runScanAndNotify();
-    startCountdown();
-    liveTimer = setInterval(() => { runScanAndNotify(); startCountdown(); }, REFRESH_INTERVAL * 1000);
-  } else {
-    btn.textContent = '▶ Start Signals';
-    btn.className = 'btn btn-primary';
-    dot.style.background = '#475569';
-    clearInterval(liveTimer);
-    clearInterval(countdownTimer);
-    document.getElementById('countdown').textContent = '';
-  }
-}
-
-function startCountdown() {
-  clearInterval(countdownTimer);
-  countdownVal = REFRESH_INTERVAL;
-  document.getElementById('countdown').textContent = `↻ ${countdownVal}s`;
-  countdownTimer = setInterval(() => {
-    countdownVal--;
-    if (countdownVal <= 0) { clearInterval(countdownTimer); document.getElementById('countdown').textContent = ''; }
-    else document.getElementById('countdown').textContent = `↻ ${countdownVal}s`;
-  }, 1000);
-}
-
-// ═══════════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════════
-renderPairStrip();
-updateHeader();
-// Initial scan so app loads with data
-runScan();
-
-// Update session badge every minute
-setInterval(updateHeader, 60000);
-</script>
-</body>
-</html>
+  const price=getSimPrice(pair);
+  const bars=generateBars(pair,currentTF);
+  const sess=currentSessi
